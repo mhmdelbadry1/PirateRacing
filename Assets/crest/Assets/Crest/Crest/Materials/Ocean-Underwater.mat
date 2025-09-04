@@ -19,7 +19,6 @@ Material:
   - _DIRECTIONALLIGHTVARYROUGHNESS_ON
   - _FOAM3DLIGHTING_ON
   - _FOAM_ON
-  - _PLANARREFLECTIONS_ON
   - _SHADOWS_ON
   - _SUBSURFACESCATTERING_ON
   - _TRANSPARENCY_ON
@@ -131,26 +130,26 @@ Material:
     - _Flow: 0
     - _Foam: 1
     - _Foam3DLighting: 1
-    - _FoamBubbleParallax: 0.124
-    - _FoamScale: 12.7
+    - _FoamBubbleParallax: 0.14
+    - _FoamScale: 10
     - _ForceUnderwater: 0
     - _FresnelPower: 5
     - _Invert: 1
     - _MipBias: 0
     - _Moving: 0.17
-    - _NormalsScale: 82
-    - _NormalsStrength: 0.49
+    - _NormalsScale: 40
+    - _NormalsStrength: 0.36
     - _NormalsStrengthOverall: 1
     - _Offset: 0.00008
     - _OverrideReflectionCubemap: 0
     - _PlanarReflectionDistanceFactor: 0
     - _PlanarReflectionIntensity: 1
     - _PlanarReflectionNormalsStrength: 1
-    - _PlanarReflections: 1
+    - _PlanarReflections: 0
     - _ProceduralSky: 0
     - _Projection: 0
     - _RefractAmt: 0
-    - _RefractionStrength: 1.158
+    - _RefractionStrength: 1
     - _RefractiveIndexOfAir: 1
     - _RefractiveIndexOfWater: 1.333
     - _Roughness: 0
@@ -183,7 +182,7 @@ Material:
     - _WaveFoamCoverage: 0.38
     - _WaveFoamFeather: 0.4
     - _WaveFoamLightScale: 1.353
-    - _WaveFoamNormalStrength: 3.6
+    - _WaveFoamNormalStrength: 3.5
     - _WaveFoamNormalsY: 0.253
     - _WaveFoamSpecularBoost: 0.15
     - _WaveFoamSpecularFallOff: 293
