@@ -12,13 +12,17 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _ALBEDO_ON
   - _CAUSTICS_ON
   - _CLIPSURFACE_ON
+  - _CLIPUNDERTERRAIN_ON
   - _COMPUTEDIRECTIONALLIGHT_ON
   - _DEBUGVISUALISE_NONE
   - _FOAM3DLIGHTING_ON
   - _FOAM_ON
+  - _SUBSURFACESHALLOWCOLOUR_ON
   - _TRANSPARENCY_ON
+  - _UNDERWATER_ON
   m_InvalidKeywords:
   - _COMPILESHADERWITHDEBUGINFO_ON
   - _DEBUGMULTIPLYBYLIGHT0COLOR_ON
@@ -92,7 +96,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Albedo: 0
+    - _Albedo: 1
     - _ApplyFlowToNormals: 0
     - _ApplyNormalMapping: 0
     - _BumpAmt: 0.514
@@ -105,9 +109,9 @@ Material:
     - _CausticsFocalDepth: 2
     - _CausticsStrength: 3.2
     - _CausticsTextureAverage: 0.07
-    - _CausticsTextureScale: 5
+    - _CausticsTextureScale: 10.2
     - _ClipSurface: 1
-    - _ClipUnderTerrain: 0
+    - _ClipUnderTerrain: 1
     - _CompileShaderWithDebugInfo: 0
     - _ComputeDirectionalLight: 1
     - _CullMode: 2
@@ -127,7 +131,7 @@ Material:
     - _Flow: 0
     - _Foam: 1
     - _Foam3DLighting: 1
-    - _FoamBubbleParallax: 0.1
+    - _FoamBubbleParallax: 0.169
     - _FoamScale: 5
     - _FresnelPower: 5
     - _Invert: 1
@@ -163,13 +167,13 @@ Material:
     - _SubSurfaceHeightMax: 24.9
     - _SubSurfaceHeightPower: 1.68
     - _SubSurfaceScattering: 0
-    - _SubSurfaceShallowColour: 0
+    - _SubSurfaceShallowColour: 1
     - _SubSurfaceSun: 1.13
     - _SubSurfaceSunFallOff: 7.11
     - _TexelSize: 0.125
     - _TextureRes: 1024
     - _Transparency: 1
-    - _Underwater: 0
+    - _Underwater: 1
     - _Update: 0.083
     - _WaveFoamBubblesCoverage: 1.68
     - _WaveFoamBubblesFeather: 0.32
