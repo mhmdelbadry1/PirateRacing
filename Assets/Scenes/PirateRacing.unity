@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
+  m_Fog: 1
   m_FogColor: {r: 0.83137256, g: 0.92941177, b: 0.93333334, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.002
+  m_FogDensity: 0.02
   m_LinearFogStart: 1000
   m_LinearFogEnd: 10000
   m_AmbientSkyColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
@@ -29,7 +29,7 @@ RenderSettings:
   m_SkyboxMaterial: {fileID: 2100000, guid: e5365841cb1f8bc42a6fdbf574f0c32f, type: 2}
   m_HaloStrength: 0.481
   m_FlareStrength: 1
-  m_FlareFadeSpeed: 11.82
+  m_FlareFadeSpeed: 6.3
   m_HaloTexture: {fileID: 0}
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
