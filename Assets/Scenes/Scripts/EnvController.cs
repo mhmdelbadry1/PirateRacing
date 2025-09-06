@@ -9,7 +9,7 @@ public class EnvController : MonoBehaviour
     public float killRadius = 3000f;
 
     public ObstacleSpawner spawner;
-    public int startSpawnCount = 20;
+    public int startSpawnCount = 2;
     public bool clearBeforeSpawn = true;
 
     public bool snapToSeaLevel = true;
@@ -41,8 +41,8 @@ public class EnvController : MonoBehaviour
         {
             if (clearBeforeSpawn) spawner.ClearSpawned();
             spawner.spawnCenter = agent.transform;
-            spawner.spawnCount = startSpawnCount;
             spawner.SpawnObstaclesAhead();
+
         }
     }
 }

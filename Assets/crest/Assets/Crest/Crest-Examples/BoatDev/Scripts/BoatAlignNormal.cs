@@ -1,6 +1,7 @@
-﻿// Crest Ocean System
-
-// This file is subject to the MIT License as seen in the root of this folder structure (LICENSE)
+﻿// Modified BoatAlignNormal (full) — crest buoyancy + optional ML-Agent control
+// Keeps original buoyancy / drag / orientation behaviour, and accepts throttle/steer
+// from an external controller (e.g. ShipAgent). If useAgentControls is false, it
+// falls back to the original player keyboard inputs when _playerControlled==true.
 
 #if CREST_UNITY_INPUT && ENABLE_INPUT_SYSTEM
 #define INPUT_SYSTEM_ENABLED
@@ -12,16 +13,9 @@ using UnityEngine.InputSystem;
 
 namespace Crest.Examples
 {
-    /// <summary>
-    /// Simple type of buoyancy - takes one sample and matches boat height and orientation to water height and normal.
-    /// </summary>
     [AddComponentMenu(Crest.Internal.Constants.MENU_PREFIX_EXAMPLE + "Boat Align Normal")]
     public class BoatAlignNormal : FloatingObjectBase
     {
-        /// <summary>
-        /// The version of this asset. Can be used to migrate across versions. This value should
-        /// only be changed when the editor upgrades the version.
-        /// </summary>
         [SerializeField, HideInInspector]
 #pragma warning disable 414
         int _version = 0;
@@ -61,11 +55,19 @@ namespace Crest.Examples
         public float _dragInWaterForward = 1f;
 
         [Header("Controls")]
-        public bool _playerControlled = true;
-        [Tooltip("Used to automatically add throttle input")]
+        [Tooltip("Allow player keyboard input (legacy).")]
+        public bool _playerControlled = false;
+        [Tooltip("Used to automatically add throttle input (bias).")]
         public float _throttleBias = 0f;
-        [Tooltip("Used to automatically add turning input")]
+        [Tooltip("Used to automatically add turning input (bias).")]
         public float _steerBias = 0f;
+
+        [Header("Agent Controls")]
+        [Tooltip("If true, use AgentThrottle/AgentSteer values instead of player keyboard.")]
+        public bool useAgentControls = true;
+
+        [HideInInspector] public float AgentThrottle = 0f; // [-1..1] from external controller
+        [HideInInspector] public float AgentSteer = 0f;    // [-1..1] from external controller
 
         [Header("Debug")]
         [SerializeField]
@@ -74,7 +76,7 @@ namespace Crest.Examples
         bool _inWater;
         public override bool InWater => _inWater;
 
-        public override Vector3 Velocity => _rb.LinearVelocity();
+        public override Vector3 Velocity => _rb != null ? _rb.LinearVelocity() : Vector3.zero;
 
         Rigidbody _rb;
 
@@ -85,6 +87,16 @@ namespace Crest.Examples
         void Start()
         {
             _rb = GetComponent<Rigidbody>();
+            if (_rb == null)
+            {
+                Debug.LogWarning("[BoatAlignNormal] Rigidbody not found on boat. Add a Rigidbody component.");
+            }
+
+            // Ensure not accidentally controlled by player when using agent controls:
+            if (useAgentControls)
+            {
+                _playerControlled = false;
+            }
         }
 
         void FixedUpdate()
@@ -94,14 +106,14 @@ namespace Crest.Examples
                 return;
             }
 
+            if (_rb == null) return;
+
             UnityEngine.Profiling.Profiler.BeginSample("BoatAlignNormal.FixedUpdate");
 
+            // Sample surface height + normal + surface velocity
             _sampleHeightHelper.Init(transform.position, _boatWidth, true);
             var height = OceanRenderer.Instance.SeaLevel;
-
             _sampleHeightHelper.Sample(out Vector3 disp, out var normal, out var waterSurfaceVel);
-
-            // height = base sea level + surface displacement y
             height += disp.y;
 
             if (_debugDraw)
@@ -111,15 +123,12 @@ namespace Crest.Examples
                 VisualiseCollisionArea.DebugDrawCross(surfPos, normal, 1f, Color.red);
             }
 
+            // Sample surface flow and incorporate into water velocity
             {
                 _sampleFlowHelper.Init(transform.position, _boatWidth);
-
                 _sampleFlowHelper.Sample(out var surfaceFlow);
                 waterSurfaceVel += new Vector3(surfaceFlow.x, 0, surfaceFlow.y);
             }
-
-            // I could filter the surface vel as the min of the last 2 frames. theres a hard case where a wavelength is turned on/off
-            // which generates single frame vel spikes - because the surface legitimately moves very fast.
 
             if (_debugDraw)
             {
@@ -129,8 +138,8 @@ namespace Crest.Examples
 
             var velocityRelativeToWater = Velocity - waterSurfaceVel;
 
+            // compute depth of bottom (positive => submerged)
             float bottomDepth = height - transform.position.y - _bottomH;
-
             _inWater = bottomDepth > 0f;
             if (!_inWater)
             {
@@ -138,6 +147,7 @@ namespace Crest.Examples
                 return;
             }
 
+            // Buoyancy (cubic with depth for a strong restoring force)
             var buoyancy = -Physics.gravity.normalized * _buoyancyCoeff * bottomDepth * bottomDepth * bottomDepth;
             if (_maximumBuoyancyForce < Mathf.Infinity)
             {
@@ -145,49 +155,55 @@ namespace Crest.Examples
             }
             _rb.AddForce(buoyancy, ForceMode.Acceleration);
 
-            // Approximate hydrodynamics of sliding along water
+            // downhill surf force
             if (_accelerateDownhill > 0f)
             {
                 _rb.AddForce(new Vector3(normal.x, 0f, normal.z) * -Physics.gravity.y * _accelerateDownhill, ForceMode.Acceleration);
             }
 
-            // apply drag relative to water
+            // apply directional drag relative to water motion
             var forcePosition = _rb.worldCenterOfMass + _forceHeightOffset * Vector3.up;
             _rb.AddForceAtPosition(Vector3.up * Vector3.Dot(Vector3.up, -velocityRelativeToWater) * _dragInWaterUp, forcePosition, ForceMode.Acceleration);
             _rb.AddForceAtPosition(transform.right * Vector3.Dot(transform.right, -velocityRelativeToWater) * _dragInWaterRight, forcePosition, ForceMode.Acceleration);
             _rb.AddForceAtPosition(transform.forward * Vector3.Dot(transform.forward, -velocityRelativeToWater) * _dragInWaterForward, forcePosition, ForceMode.Acceleration);
 
+            // --- Controls: decide source (agent vs player) ---
             float forward = _throttleBias;
-#if INPUT_SYSTEM_ENABLED
-            float rawForward = !Application.isFocused ? 0 : ((Keyboard.current.wKey.isPressed ? 1 : 0) + (Keyboard.current.sKey.isPressed ? -1 : 0));
-#else
-            float rawForward = Input.GetAxis("Vertical");
-#endif
-            if (_playerControlled) forward += rawForward;
-            _rb.AddForceAtPosition(transform.forward * _enginePower * forward, forcePosition, ForceMode.Acceleration);
-
-            float reverseMultiplier = (rawForward < 0f ? -1f : 1f);
             float sideways = _steerBias;
-            if (_playerControlled) sideways +=
+
+            if (useAgentControls)
+            {
+                // Agent gives -1..1 values for throttle & steer
+                forward += Mathf.Clamp(AgentThrottle, -1f, 1f);
+                sideways += Mathf.Clamp(AgentSteer, -1f, 1f);
+            }
+            else if (_playerControlled)
+            {
 #if INPUT_SYSTEM_ENABLED
-                    !Application.isFocused ? 0 :
-                    ((Keyboard.current.aKey.isPressed ? reverseMultiplier * -1f : 0f) +
-                    (Keyboard.current.dKey.isPressed ? reverseMultiplier * 1f : 0f));
+                float rawForward = !Application.isFocused ? 0 : ((Keyboard.current.wKey.isPressed ? 1 : 0) + (Keyboard.current.sKey.isPressed ? -1 : 0));
+                float reverseMultiplier = (rawForward < 0f ? -1f : 1f);
+                float rawRight = !Application.isFocused ? 0 :
+                    ((Keyboard.current.aKey.isPressed ? reverseMultiplier * -1f : 0) + (Keyboard.current.dKey.isPressed ? reverseMultiplier * 1f : 0));
 #else
-                    (Input.GetKey(KeyCode.A) ? reverseMultiplier * -1f : 0f) +
-                    (Input.GetKey(KeyCode.D) ? reverseMultiplier * 1f : 0f);
+                float rawForward = Input.GetAxis("Vertical");
+                float reverseMultiplier = (rawForward < 0f ? -1f : 1f);
+                float rawRight = (Input.GetKey(KeyCode.A) ? reverseMultiplier * -1f : 0) + (Input.GetKey(KeyCode.D) ? reverseMultiplier * 1f : 0);
 #endif
+                forward += rawForward;
+                sideways += rawRight;
+            }
+
+            // apply engine / turning forces
+            _rb.AddForceAtPosition(transform.forward * _enginePower * forward, forcePosition, ForceMode.Acceleration);
             _rb.AddTorque(transform.up * _turnPower * sideways, ForceMode.Acceleration);
 
+            // orientation correction to water normal
             FixedUpdateOrientation(normal);
 
             UnityEngine.Profiling.Profiler.EndSample();
         }
 
-        /// <summary>
-        /// Align to water normal. One normal by default, but can use a separate normal based on boat length vs width. This gives
-        /// varying rotations based on boat dimensions.
-        /// </summary>
+        // Align to water normal. One normal by default, but can use a separate normal based on boat length vs width.
         void FixedUpdateOrientation(Vector3 normalSideways)
         {
             Vector3 normal = normalSideways, normalLongitudinal = Vector3.up;

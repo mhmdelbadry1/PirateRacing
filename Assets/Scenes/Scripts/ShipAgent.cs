@@ -9,12 +9,10 @@ public class ShipAgent : Agent
     [Header("References")]
     public EnvController env;
     public Transform goal;
+    private Crest.Examples.BoatAlignNormal boat; // مرجع للـ Crest boat
 
     [Header("Movement")]
-    public float enginePower = 12f;
-    public float turnPower = 1.6f;
     public float maxSpeed = 18f;
-    public float waterDrag = 0.3f;
 
     [Header("Sensing")]
     public int rays = 9;
@@ -34,7 +32,9 @@ public class ShipAgent : Agent
 
     public override void Initialize()
     {
+        Debug.Log($"[ShipAgent] Expected obs size = {5 + rays}");
         rb = GetComponent<Rigidbody>();
+        boat = GetComponent<Crest.Examples.BoatAlignNormal>();
         rb.maxAngularVelocity = 10f;
     }
 
@@ -49,22 +49,18 @@ public class ShipAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // relative direction to goal (local x,z)
         Vector3 toGoal = (goal.position - transform.position).normalized;
         Vector3 toGoalLocal = transform.InverseTransformDirection(toGoal);
         sensor.AddObservation(toGoalLocal.x);
         sensor.AddObservation(toGoalLocal.z);
 
-        // distance to goal (normalized)
         float dist = Mathf.Clamp01(Vector3.Distance(transform.position, goal.position) / 1000f);
         sensor.AddObservation(dist);
 
-        // velocity local (x,z)
         Vector3 velLocal = transform.InverseTransformDirection(rb.velocity);
         sensor.AddObservation(velLocal.x);
         sensor.AddObservation(velLocal.z);
 
-        // ray fan
         float half = rayAngleSpan * 0.5f;
         for (int i = 0; i < rays; i++)
         {
@@ -83,12 +79,14 @@ public class ShipAgent : Agent
         float throttle = Mathf.Clamp(actions.ContinuousActions[0], -1f, 1f);
         float steer = Mathf.Clamp(actions.ContinuousActions[1], -1f, 1f);
 
-        rb.AddForce(transform.forward * enginePower * throttle, ForceMode.Acceleration);
-        rb.AddTorque(Vector3.up * steer * turnPower, ForceMode.Acceleration);
+        if (boat != null)
+        {
+            boat.AgentThrottle = throttle;
+            boat.AgentSteer = steer;
+        }
 
         if (rb.velocity.magnitude > maxSpeed)
             rb.velocity = rb.velocity.normalized * maxSpeed;
-        rb.velocity *= (1f - waterDrag * Time.fixedDeltaTime);
 
         AddReward(stepPenalty);
         float d = DistanceToGoal();
