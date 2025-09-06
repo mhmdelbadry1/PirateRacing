@@ -17,6 +17,8 @@ public class EnvController : MonoBehaviour
 
     public void ResetEnvironment(ShipAgent agent)
     {
+        Debug.Log("[EnvController] ResetEnvironment START");
+
         Vector2 rand = Random.insideUnitCircle * startRadius;
         Vector3 start = startAreaCenter != null ? startAreaCenter.position : transform.position;
         Vector3 pos = new Vector3(start.x + rand.x, start.y, start.z + rand.y);
@@ -44,5 +46,13 @@ public class EnvController : MonoBehaviour
             spawner.SpawnObstaclesAhead();
 
         }
+        else{
+          
+            Debug.Log("[EnvController] spawner is null, quick reset.");
+            
+        }
+
+        Debug.Log("[EnvController] ResetEnvironment END");
+
     }
 }

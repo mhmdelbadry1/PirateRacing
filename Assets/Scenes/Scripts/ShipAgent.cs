@@ -85,6 +85,11 @@ public class ShipAgent : Agent
             boat.AgentSteer = steer;
         }
 
+        if (StepCount % 50 == 0)
+        {
+            Debug.Log($"[ShipAgent] Step {StepCount}: throttle={throttle:F2}, steer={steer:F2}, pos={transform.position}");
+        }   
+
         if (rb.velocity.magnitude > maxSpeed)
             rb.velocity = rb.velocity.normalized * maxSpeed;
 
