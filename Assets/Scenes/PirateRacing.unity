@@ -3182,7 +3182,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1186684281}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
@@ -6047,6 +6047,8 @@ MonoBehaviour:
   collisionPenalty: -0.5
   reachGoalReward: 2
   maxStepsPerEpisode: 4000
+  logActions: 1
+  testMovementOnStart: 0
 --- !u!114 &1788770262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6071,7 +6073,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: ShipBrain
   TeamId: 0
   m_UseChildSensors: 1

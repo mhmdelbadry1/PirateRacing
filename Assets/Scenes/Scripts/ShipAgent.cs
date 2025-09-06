@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Demonstrations;
 
 [RequireComponent(typeof(Rigidbody))]
 public class ShipAgent : Agent
@@ -23,21 +24,33 @@ public class ShipAgent : Agent
     public LayerMask obstacleMask;
 
     [Header("Rewards")]
-    public float stepPenalty = -0.0005f;
-    public float progressRewardScale = 0.01f;
+    public float stepPenalty = -0.001f;
+    public float progressRewardScale = 1.0f;
     public float collisionPenalty = -0.5f;
-    public float reachGoalReward = 2f;
-    public int maxStepsPerEpisode = 4000;
+    public float reachGoalReward = 10f;
+    public int maxStepsPerEpisode = 2000;
 
+    [Header("Behavior Cloning")]
+    public bool enableBehaviorCloning = true;
+    public float demonstrationRewardScale = 1.0f;
+    public float humanInputThreshold = 0.1f; // Minimum input to count as demonstration
+    
     [Header("Debug")]
     public bool logActions = true;
     public bool testMovementOnStart = false;
+    public bool showHumanInputGUI = true;
 
     private Rigidbody rb;
     private float prevDistToGoal;
     private float currentThrottle = 0f;
     private float currentSteer = 0f;
     private bool isInitialized = false;
+    
+    // Behavior cloning variables
+    private bool isReceivingHumanInput = false;
+    private float lastHumanThrottle = 0f;
+    private float lastHumanSteer = 0f;
+    private int demonstrationSteps = 0;
 
     public override void Initialize()
     {
@@ -75,6 +88,11 @@ public class ShipAgent : Agent
             
             Debug.Log($"[ShipAgent] Boat configured successfully: useAgentControls={boat.useAgentControls}, _playerControlled={boat._playerControlled}");
             Debug.Log($"[ShipAgent] Expected observation size = {5 + rays}");
+            
+            if (enableBehaviorCloning)
+            {
+                Debug.Log("[ShipAgent] Behavior cloning enabled - Use WASD/Arrow keys to demonstrate!");
+            }
         }
         catch (System.Exception e)
         {
@@ -227,8 +245,6 @@ public class ShipAgent : Agent
             Debug.LogError("[ShipAgent] Agent not initialized, cannot process actions");
             return;
         }
-
-        Debug.Log($"[ShipAgent] OnActionReceived called");
         
         try
         {
@@ -242,10 +258,34 @@ public class ShipAgent : Agent
             float throttle = Mathf.Clamp(actions.ContinuousActions[0], -1f, 1f);
             float steer = Mathf.Clamp(actions.ContinuousActions[1], -1f, 1f);
             
+            // Check for human input override for behavior cloning
+            if (enableBehaviorCloning)
+            {
+                float humanThrottle, humanSteer;
+                if (GetHumanInput(out humanThrottle, out humanSteer))
+                {
+                    // Use human input and provide demonstration reward
+                    throttle = humanThrottle;
+                    steer = humanSteer;
+                    isReceivingHumanInput = true;
+                    demonstrationSteps++;
+                    
+                    // Reward for providing good demonstrations
+                    AddReward(demonstrationRewardScale * 0.01f);
+                    
+                    if (StepCount % 50 == 0)
+                    {
+                        Debug.Log($"[ShipAgent] Using human demonstration: throttle={throttle:F2}, steer={steer:F2}");
+                    }
+                }
+                else
+                {
+                    isReceivingHumanInput = false;
+                }
+            }
+            
             currentThrottle = throttle;
             currentSteer = steer;
-
-            Debug.Log($"[ShipAgent] Applying boat control: throttle={throttle:F2}, steer={steer:F2}");
 
             // Apply to Crest BoatAlignNormal controller
             if (boat != null)
@@ -255,7 +295,8 @@ public class ShipAgent : Agent
                 
                 if (logActions && StepCount % 50 == 0)
                 {
-                    Debug.Log($"[ShipAgent] Applied to BoatAlignNormal: throttle={throttle:F3}, steer={steer:F3}");
+                    string inputSource = isReceivingHumanInput ? "HUMAN" : "AI";
+                    Debug.Log($"[ShipAgent] Applied to BoatAlignNormal ({inputSource}): throttle={throttle:F3}, steer={steer:F3}");
                 }
             }
             else
@@ -287,17 +328,32 @@ public class ShipAgent : Agent
             AddReward(stepPenalty);
             
             // Progress reward (positive when getting closer)
-            if (Mathf.Abs(progress) > 0.01f) // Only reward meaningful progress
+            if (Mathf.Abs(progress) > 0.1f)
             {
-                AddReward(progress * progressRewardScale);
+                float progressReward = progress * progressRewardScale;
+                AddReward(progressReward);
+                
+                // Extra reward for progress during human demonstration
+                if (isReceivingHumanInput)
+                {
+                    AddReward(progressReward * 0.5f); // Bonus for good human demonstration
+                }
             }
             
-            // Small distance penalty to encourage reaching goal
-            AddReward(-currentDist * 0.0001f);
+            // Speed reward to encourage movement
+            float speed = rb.velocity.magnitude;
+            if (speed > 1f)
+            {
+                AddReward(0.001f * speed);
+            }
             
             prevDistToGoal = currentDist;
 
-            Debug.Log($"[ShipAgent] Step {StepCount}: StepPenalty={stepPenalty:F4}, ProgressReward={progress * progressRewardScale:F4}, TotalReward={GetCumulativeReward():F4}");
+            if (StepCount % 100 == 0)
+            {
+                string demoInfo = enableBehaviorCloning ? $", DemoSteps={demonstrationSteps}" : "";
+                Debug.Log($"[ShipAgent] Step {StepCount}: Distance={currentDist:F1}, Speed={speed:F1}, Progress={progress:F3}, TotalReward={GetCumulativeReward():F2}{demoInfo}");
+            }
 
             // Check bounds
             if (env != null && env.killZone != null)
@@ -325,16 +381,39 @@ public class ShipAgent : Agent
         }
     }
 
-    public override void Heuristic(in ActionBuffers actionsOut)
+    /// <summary>
+    /// Captures human input for behavior cloning demonstrations
+    /// </summary>
+    private bool GetHumanInput(out float throttle, out float steer)
     {
-        var continuousActionsOut = actionsOut.ContinuousActions;
-        float throttle = 0f; 
-        float steer = 0f;
+        throttle = 0f;
+        steer = 0f;
         
+        // Capture keyboard input
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) throttle += 1f;
         if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) throttle -= 1f;
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) steer -= 1f;
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) steer += 1f;
+        
+        // Check if input is significant enough to count as demonstration
+        bool hasInput = Mathf.Abs(throttle) > humanInputThreshold || Mathf.Abs(steer) > humanInputThreshold;
+        
+        if (hasInput)
+        {
+            lastHumanThrottle = throttle;
+            lastHumanSteer = steer;
+        }
+        
+        return hasInput;
+    }
+
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        var continuousActionsOut = actionsOut.ContinuousActions;
+        
+        // Use the same human input method for consistency
+        float throttle, steer;
+        GetHumanInput(out throttle, out steer);
         
         continuousActionsOut[0] = throttle;
         continuousActionsOut[1] = steer;
@@ -416,18 +495,32 @@ public class ShipAgent : Agent
             GUI.Label(new Rect(10, 30, 300, 20), $"Agent Steer: {currentSteer:F2}");
             GUI.Label(new Rect(10, 50, 300, 20), $"Velocity: {(rb != null ? rb.velocity.magnitude : 0):F2}");
             GUI.Label(new Rect(10, 70, 300, 20), $"Distance to Goal: {DistanceToGoal():F2}");
-            if (boat != null)
+            
+            if (enableBehaviorCloning && showHumanInputGUI)
             {
-                GUI.Label(new Rect(10, 90, 300, 20), $"Boat Throttle: {boat.AgentThrottle:F2}");
-                GUI.Label(new Rect(10, 110, 300, 20), $"Boat Steer: {boat.AgentSteer:F2}");
-                GUI.Label(new Rect(10, 130, 300, 20), $"Use Agent Controls: {boat.useAgentControls}");
-            }
-            else
-            {
-                GUI.Label(new Rect(10, 90, 300, 20), $"BoatAlignNormal: NULL");
+                if (isReceivingHumanInput)
+                {
+                    GUI.color = Color.green;
+                    GUI.Label(new Rect(10, 90, 300, 20), "🎮 HUMAN CONTROL ACTIVE");
+                    GUI.Label(new Rect(10, 110, 300, 20), $"Demo Steps: {demonstrationSteps}");
+                }
+                else
+                {
+                    GUI.color = Color.yellow;
+                    GUI.Label(new Rect(10, 90, 300, 20), "🤖 AI CONTROL - Use WASD to demonstrate");
+                }
+                GUI.color = Color.white;
+                GUI.Label(new Rect(10, 130, 300, 20), "W/S: Throttle, A/D: Steer");
             }
             
-            GUI.Label(new Rect(10, 150, 300, 20), $"Initialized: {isInitialized}");
+            if (boat != null)
+            {
+                GUI.Label(new Rect(10, 150, 300, 20), $"Boat Throttle: {boat.AgentThrottle:F2}");
+                GUI.Label(new Rect(10, 170, 300, 20), $"Boat Steer: {boat.AgentSteer:F2}");
+                GUI.Label(new Rect(10, 190, 300, 20), $"Use Agent Controls: {boat.useAgentControls}");
+            }
+            
+            GUI.Label(new Rect(10, 210, 300, 20), $"Initialized: {isInitialized}");
         }
     }
 }

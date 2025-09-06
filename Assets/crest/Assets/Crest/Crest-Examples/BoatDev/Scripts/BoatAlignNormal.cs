@@ -32,8 +32,8 @@ namespace Crest.Examples
         [Header("Engine Power")]
         [Tooltip("Vertical offset for where engine force should be applied.")]
         public float _forceHeightOffset = -0.3f;
-        public float _enginePower = 11f;
-        public float _turnPower = 1.3f;
+        public float _enginePower = 50f; // Increased from 11f to 50f for better movement
+        public float _turnPower = 8f;    // Increased from 1.3f to 8f for better steering
 
         [Header("Wave Response")]
         [Tooltip("Width dimension of boat.")]

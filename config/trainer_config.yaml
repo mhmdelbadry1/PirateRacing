@@ -19,6 +19,19 @@ behaviors:
       extrinsic:
         gamma: 0.99
         strength: 1.0
+
+    # --- Behavioral Cloning (pretrain + blended) ---
+    behavioral_cloning:
+      # This can be a single .demo file or a directory containing multiple .demo files.
+      # Using an absolute Windows path: ensure the Python process has access.
+      demo_path: "D:/Unity/Projects/Pirates/Assets/Demonstrations"
+      strength: 0.30 # how strongly BC loss influences updates (0.1 - 0.5 typical)
+      steps: 100000 # number of trainer steps BC is active (pretrain + blended phase)
+      batch_size: 1024
+      num_epoch: 3
+
+    # --- Checkpoints & training control ---
+    keep_checkpoints: 5
     max_steps: 500000
     time_horizon: 64
     summary_freq: 10000
