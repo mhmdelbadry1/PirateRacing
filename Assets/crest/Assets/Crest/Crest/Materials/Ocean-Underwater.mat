@@ -14,7 +14,6 @@ Material:
   m_ValidKeywords:
   - _CAUSTICS_ON
   - _CLIPSURFACE_ON
-  - _CLIPUNDERTERRAIN_ON
   - _COMPUTEDIRECTIONALLIGHT_ON
   - _DEBUGVISUALISE_NONE
   - _DIRECTIONALLIGHTVARYROUGHNESS_ON
@@ -111,10 +110,10 @@ Material:
     - _CausticsTextureAverage: 0.07
     - _CausticsTextureScale: 5
     - _ClipSurface: 1
-    - _ClipUnderTerrain: 1
+    - _ClipUnderTerrain: 0
     - _CompileShaderWithDebugInfo: 0
     - _ComputeDirectionalLight: 1
-    - _CullMode: 2
+    - _CullMode: 0
     - _DebugDisableMultiplyByLight0Color: 0
     - _DebugDisableShapeTextures: 0
     - _DebugDisableSmoothLOD: 0
@@ -138,8 +137,8 @@ Material:
     - _Invert: 1
     - _MipBias: 0
     - _Moving: 0.17
-    - _NormalsScale: 100
-    - _NormalsStrength: 0.67
+    - _NormalsScale: 40
+    - _NormalsStrength: 0.36
     - _NormalsStrengthOverall: 1
     - _Offset: 0.00008
     - _OverrideReflectionCubemap: 0
@@ -156,14 +155,14 @@ Material:
     - _Roughness: 0
     - _S: 1
     - _Shadows: 1
-    - _ShorelineFoamMinDepth: 0.1
+    - _ShorelineFoamMinDepth: 0.27
     - _SkyDirectionality: 0.875
     - _Specular: 0.7
     - _StartLevel: 0.157
     - _StencilFunction: 0
-    - _SubSurfaceBase: 1.79
-    - _SubSurfaceDepthMax: 16.4
-    - _SubSurfaceDepthPower: 7
+    - _SubSurfaceBase: 0
+    - _SubSurfaceDepthMax: 7
+    - _SubSurfaceDepthPower: 2.57
     - _SubSurfaceHeightLerp: 1
     - _SubSurfaceHeightMax: 24.9
     - _SubSurfaceHeightPower: 1.68
@@ -181,7 +180,7 @@ Material:
     - _WaveFoamBubblesStart: 0.115
     - _WaveFoamBubblesStrength: 0.637
     - _WaveFoamCoverage: 0.38
-    - _WaveFoamFeather: 0.88
+    - _WaveFoamFeather: 0.4
     - _WaveFoamLightScale: 1.353
     - _WaveFoamNormalStrength: 3.5
     - _WaveFoamNormalsY: 0.253
@@ -190,7 +189,7 @@ Material:
     - _WaveFoamStart: 0
     - _WaveFoamStrength: 1
     m_Colors:
-    - _DepthFogDensity: {r: 0.9, g: 0.3, b: 0.36, a: 1}
+    - _DepthFogDensity: {r: 0.9, g: 0.3, b: 0.35, a: 1}
     - _Diffuse: {r: 0, g: 0.003921569, b: 0.16862746, a: 1}
     - _DiffuseGrazing: {r: 0, g: 0.003921569, b: 0.16862746, a: 1}
     - _DiffuseShadow: {r: 0, g: 0, b: 0.08627451, a: 1}

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3244559910348058550}
   - component: {fileID: 3244559910349155702}
   - component: {fileID: 995236543555920392}
+  - component: {fileID: 8367358136261259273}
   m_Layer: 0
   m_Name: Island0 (3)
   m_TagString: Untagged
@@ -32,7 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -89.98, y: 65, z: 0}
 --- !u!33 &3244559910348058550
 MeshFilter:
@@ -106,3 +107,16 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 386033b9b0ae11a40bbd970400b6d7c6, type: 3}
+--- !u!114 &8367358136261259273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3244559910351352758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478734c1d1a9d584bb77480eb6ad93d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slowFactor: 0.6

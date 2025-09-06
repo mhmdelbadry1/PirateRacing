@@ -60,7 +60,7 @@ public class ObstacleSpawner : MonoBehaviour
         if (autoClearOld) ClearBehindPlayer();
     }
 
-    void SpawnObstaclesAhead()
+public void SpawnObstaclesAhead()
     {
         if (prefabsWithSettings.Count == 0) return;
 
