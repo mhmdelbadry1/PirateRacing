@@ -9,10 +9,12 @@ public class ShipAgent : Agent
     [Header("References")]
     public EnvController env;
     public Transform goal;
-    private Crest.Examples.BoatAlignNormal boat; // مرجع للـ Crest boat
+    private Crest.Examples.BoatAlignNormal boat;
 
     [Header("Movement")]
     public float maxSpeed = 18f;
+    public float forceScale = 10f; // For direct Rigidbody control
+    public float torqueScale = 100f;
 
     [Header("Sensing")]
     public int rays = 9;
@@ -35,6 +37,7 @@ public class ShipAgent : Agent
         Debug.Log($"[ShipAgent] Expected obs size = {5 + rays}");
         rb = GetComponent<Rigidbody>();
         boat = GetComponent<Crest.Examples.BoatAlignNormal>();
+        if (boat == null) Debug.LogError("[ShipAgent] BoatAlignNormal component is missing!");
         rb.maxAngularVelocity = 10f;
     }
 
@@ -45,6 +48,7 @@ public class ShipAgent : Agent
         if (env != null) env.ResetEnvironment(this);
         if (goal == null && env != null) goal = env.goal;
         prevDistToGoal = DistanceToGoal();
+        Debug.Log($"[ShipAgent] Episode begin: pos={transform.position}, goal={goal.position}");
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -72,45 +76,61 @@ public class ShipAgent : Agent
                 hitNorm = hit.distance / rayLength;
             sensor.AddObservation(hitNorm);
         }
+        Debug.Log($"[ShipAgent] Observations: dist={dist:F2}, vel={velLocal}");
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
+        Debug.Log("[ShipAgent] OnActionReceived called");
         float throttle = Mathf.Clamp(actions.ContinuousActions[0], -1f, 1f);
         float steer = Mathf.Clamp(actions.ContinuousActions[1], -1f, 1f);
 
         if (boat != null)
         {
+            Debug.Log($"[ShipAgent] Applying boat control: throttle={throttle:F2}, steer={steer:F2}");
             boat.AgentThrottle = throttle;
             boat.AgentSteer = steer;
+        }
+        else
+        {
+            Debug.LogWarning("[ShipAgent] BoatAlignNormal is null, using direct Rigidbody control");
+            rb.AddForce(transform.forward * throttle * forceScale, ForceMode.Force);
+            rb.AddTorque(Vector3.up * steer * torqueScale, ForceMode.Force);
         }
 
         if (StepCount % 50 == 0)
         {
-            Debug.Log($"[ShipAgent] Step {StepCount}: throttle={throttle:F2}, steer={steer:F2}, pos={transform.position}");
-        }   
+            Debug.Log($"[ShipAgent] Step {StepCount}: throttle={throttle:F2}, steer={steer:F2}, pos={transform.position}, vel={rb.velocity.magnitude:F2}");
+        }
 
         if (rb.velocity.magnitude > maxSpeed)
             rb.velocity = rb.velocity.normalized * maxSpeed;
 
-        AddReward(stepPenalty);
         float d = DistanceToGoal();
         float progress = (prevDistToGoal - d);
+        AddReward(stepPenalty);
         AddReward(progress * progressRewardScale);
+        AddReward(-d * 0.0001f); // Encourage proximity to goal
         prevDistToGoal = d;
+
+        Debug.Log($"[ShipAgent] Step {StepCount}: StepPenalty={stepPenalty}, ProgressReward={progress * progressRewardScale:F4}, TotalReward={GetCumulativeReward():F4}");
 
         if (env != null && env.killZone != null)
         {
             float maxRange = env.killRadius;
             if ((transform.position - env.killZone.position).sqrMagnitude > maxRange * maxRange)
             {
+                Debug.Log("[ShipAgent] Out of bounds, ending episode");
                 AddReward(-1f);
                 EndEpisode();
             }
         }
 
         if (StepCount >= maxStepsPerEpisode)
+        {
+            Debug.Log("[ShipAgent] Max steps reached, ending episode");
             EndEpisode();
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -123,6 +143,7 @@ public class ShipAgent : Agent
         if (Input.GetKey(KeyCode.D)) steer += 1f;
         cont[0] = throttle;
         cont[1] = steer;
+        Debug.Log($"[ShipAgent] Heuristic: throttle={throttle:F2}, steer={steer:F2}");
     }
 
     float DistanceToGoal()
@@ -135,12 +156,14 @@ public class ShipAgent : Agent
 
     public void RewardReachGoal()
     {
+        Debug.Log("[ShipAgent] Goal reached! Reward = 2.0");
         AddReward(reachGoalReward);
         EndEpisode();
     }
 
     public void PenalizeCollision()
     {
+        Debug.Log("[ShipAgent] Collision! Penalty = -0.5");
         AddReward(collisionPenalty);
     }
 }

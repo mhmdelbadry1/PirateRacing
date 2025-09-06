@@ -34,7 +34,7 @@ public class EnvController : MonoBehaviour
             dir.y = 0f;
             if (dir.sqrMagnitude > 0.1f)
             {
-                float noise = Random.Range(-25f, 25f);
+                float noise = Random.Range(-26f, 26f);
                 agent.transform.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(0f, noise, 0f);
             }
         }

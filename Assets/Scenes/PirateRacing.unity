@@ -819,12 +819,24 @@ PrefabInstance:
       value: 6.5
       objectReference: {fileID: 0}
     - target: {fileID: 3021101255317586438, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
+      propertyPath: _debugDraw
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3021101255317586438, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
+      propertyPath: _steerBias
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3021101255317586438, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
       propertyPath: _turnPower
       value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 3021101255317586438, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
       propertyPath: _enginePower
       value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 3021101255317586438, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
+      propertyPath: _throttleBias
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3021101255317586438, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
       propertyPath: _boyancyTorque
@@ -837,6 +849,10 @@ PrefabInstance:
     - target: {fileID: 3021101255317586438, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
       propertyPath: _useBoatLength
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3021101255317586438, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
+      propertyPath: useAgentControls
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3372623405227046355, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -985,6 +1001,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2917951594504273738, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1788770261}
+    - targetCorrespondingSourceObject: {fileID: 2917951594504273738, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1788770264}
   m_SourcePrefab: {fileID: 100100000, guid: eeab37efd0ddc46a5ba05d96be38bea4, type: 3}
 --- !u!1 &174519169 stripped
 GameObject:
@@ -2733,6 +2752,7 @@ MonoBehaviour:
     preserveHeight: 0
     followSeaLevel: 0
     yOffset: -100
+    poolSize: 8
   - prefab: {fileID: 3244559910351352758, guid: 5d59c900ecd80b74e99c9c883a011361, type: 3}
     minRadius: 60
     maxRadius: 500
@@ -2740,6 +2760,7 @@ MonoBehaviour:
     preserveHeight: 0
     followSeaLevel: 0
     yOffset: -200
+    poolSize: 8
   - prefab: {fileID: 5713485994758025413, guid: 15acfdf8ba132c443b52002962de2f71, type: 3}
     minRadius: 60
     maxRadius: 500
@@ -2747,6 +2768,7 @@ MonoBehaviour:
     preserveHeight: 0
     followSeaLevel: 0
     yOffset: -100
+    poolSize: 8
   - prefab: {fileID: 3446208537085927311, guid: 6adf2192a354061448cef5ae026347ea, type: 3}
     minRadius: 30
     maxRadius: 100
@@ -2754,6 +2776,7 @@ MonoBehaviour:
     preserveHeight: 0
     followSeaLevel: 0
     yOffset: -200
+    poolSize: 8
   - prefab: {fileID: 5121157614032416282, guid: aabab8ed29118a24591a7fe97432d9f1, type: 3}
     minRadius: 500
     maxRadius: 1000
@@ -2761,6 +2784,7 @@ MonoBehaviour:
     preserveHeight: 0
     followSeaLevel: 0
     yOffset: -300
+    poolSize: 8
   spawnCenter: {fileID: 850607032}
   spawnCount: 2
   spawnOnStart: 0
@@ -6009,10 +6033,9 @@ MonoBehaviour:
   MaxStep: 0
   env: {fileID: 1264718264}
   goal: {fileID: 737564637}
-  enginePower: 12
-  turnPower: 1.6
   maxSpeed: 18
-  waterDrag: 0.3
+  forceScale: 10
+  torqueScale: 100
   rays: 9
   rayAngleSpan: 120
   rayLength: 60
@@ -6041,10 +6064,10 @@ MonoBehaviour:
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 2
-      BranchSizes: 01000000
-    VectorActionSize: 
+      BranchSizes: 
+    VectorActionSize: 02000000
     VectorActionDescriptions: []
-    VectorActionSpaceType: 0
+    VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
@@ -6054,6 +6077,20 @@ MonoBehaviour:
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_ObservableAttributeHandling: 0
+--- !u!114 &1788770264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1788770259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 1
+  TakeActionsBetweenDecisions: 1
 --- !u!4 &1789217217 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3244559910350925718, guid: 5d59c900ecd80b74e99c9c883a011361, type: 3}
