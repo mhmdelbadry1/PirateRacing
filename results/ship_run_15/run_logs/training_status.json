@@ -9,15 +9,33 @@
                 "auxillary_file_paths": [
                     "results\\ship_run_15\\ShipBrain\\ShipBrain-46792.pt"
                 ]
+            },
+            {
+                "steps": 67432,
+                "file_path": "results\\ship_run_15\\ShipBrain\\ShipBrain-67432.onnx",
+                "reward": null,
+                "creation_time": 1757233867.7244618,
+                "auxillary_file_paths": [
+                    "results\\ship_run_15\\ShipBrain\\ShipBrain-67432.pt"
+                ]
+            },
+            {
+                "steps": 274396,
+                "file_path": "results\\ship_run_15\\ShipBrain\\ShipBrain-274396.onnx",
+                "reward": -121.69798165559769,
+                "creation_time": 1757244145.767876,
+                "auxillary_file_paths": [
+                    "results\\ship_run_15\\ShipBrain\\ShipBrain-274396.pt"
+                ]
             }
         ],
         "final_checkpoint": {
-            "steps": 46792,
+            "steps": 274396,
             "file_path": "results\\ship_run_15\\ShipBrain.onnx",
-            "reward": null,
-            "creation_time": 1757232656.0667894,
+            "reward": -121.69798165559769,
+            "creation_time": 1757244145.767876,
             "auxillary_file_paths": [
-                "results\\ship_run_15\\ShipBrain\\ShipBrain-46792.pt"
+                "results\\ship_run_15\\ShipBrain\\ShipBrain-274396.pt"
             ]
         }
     },

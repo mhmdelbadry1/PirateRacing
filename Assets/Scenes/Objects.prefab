@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7204521163697621504}
-  - component: {fileID: 1864836970949787993}
   - component: {fileID: 1711961013874630154}
   - component: {fileID: 6239827146909902680}
   m_Layer: 0
@@ -30,34 +29,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2368463058770727640}
+  m_Children: []
   m_Father: {fileID: 3796674001265342549}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &1864836970949787993
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 89194259218268126}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 21.41
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1711961013874630154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2597,6 +2572,7 @@ Transform:
   m_Children:
   - {fileID: 7338077154599922629}
   - {fileID: 7204521163697621504}
+  - {fileID: 2368463058770727640}
   - {fileID: 2551639117276981650}
   - {fileID: 6456828960006235538}
   - {fileID: 6558867915907100780}
@@ -3367,12 +3343,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6084555698275145117}
-  m_LocalRotation: {x: 0.000000021855694, y: 0.000000018626451, z: -4.440892e-16, w: 1}
-  m_LocalPosition: {x: 1.0335838, y: -4.7668624, z: 1.8331375}
+  m_LocalRotation: {x: 0.000000021855694, y: 0.000000048428774, z: -4.440892e-16, w: 1}
+  m_LocalPosition: {x: 1.0330442, y: -4.7668624, z: 1.8326418}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7204521163697621504}
+  m_Father: {fileID: 3796674001265342549}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8627185008389406142
@@ -4605,36 +4581,35 @@ MonoBehaviour:
   env: {fileID: 0}
   goal: {fileID: 0}
   stepPenalty: 0.0005
-  progressRewardScale: 0.01
-  speedRewardScale: 0.002
-  obstacleAvoidanceReward: 0.01
-  safeDistanceThreshold: 0.4
+  lowSpeedPenalty: -0.015
+  lowSpeedThreshold: 7
   collisionPenalty: -0.5
-  heartRewardScale: 0.02
+  endEpisodeOnCollision: 0
   reachedGoalReward: 2
   endEpisodeOnGoal: 1
-  enableReactiveAvoidance: 1
-  avoidSteerGain: 1.6
-  closeThrottleScale: 0.5
-  closeDistanceThreshold: 0.3
-  enableRecoveryOnHit: 1
+  progressRewardScale: 0.01
+  maxStepsPerEpisode: 5000
+  goalNotReachedPenalty: -2
+  proximityPenaltyThreshold: 0.2
+  proximityPenalty: -0.002
+  safeSpeedRewardThreshold: 0.5
+  safeSpeedRewardScale: 0.002
+  enableRecovery: 1
   recoveryDuration: 1.25
   recoveryBackThrottle: -0.81
   recoverySteerStrength: 1
-  stuckSpeedThreshold: 0.6
-  stuckTimeThreshold: 1
   raycastMask:
     serializedVersion: 2
     m_Bits: 8
   rayLength: 100
   raysPerSide: 4
   rayFanAngle: 70
-  heuristicAlwaysForward: 0
-  attachRecorderAtRuntime: 1
-  demoName: ShipBCDemo
   forceForwardBias: 0
   forwardBias: 0.15
   syncAgentToBoatTransform: 1
+  recordDemonstrations: 0
+  demoDirectory: D:/Unity/Projects/Pirates/Demonstrations
+  demoName: ShipBCDemo
 --- !u!114 &6186515989889493640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4763,7 +4738,7 @@ Transform:
   m_Children:
   - {fileID: 7035060789542212445}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7149096932218794744
 GameObject:

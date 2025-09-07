@@ -23,11 +23,8 @@ public class TreasureGoal : MonoBehaviour
     private bool finished = false;
 
     private void OnTriggerEnter(Collider other)
-
-    
     {
-
-            Debug.Log($"Something entered: {other.name}, Tag = {other.tag}");
+        Debug.Log($"Something entered: {other.name}, Tag = {other.tag}");
 
         if (finished) return;
 
@@ -41,6 +38,23 @@ public class TreasureGoal : MonoBehaviour
         }
         else if (other.CompareTag(agentTag))
         {
+            // Check if this is ML-Agents training mode
+            // First try the collider itself, then parent, then children
+            var agent = other.GetComponent<ShipAgent>();
+            if (agent == null)
+                agent = other.GetComponentInParent<ShipAgent>();
+            if (agent == null)
+                agent = other.GetComponentInChildren<ShipAgent>();
+                
+            if (agent != null)
+            {
+                finished = true; // Prevent multiple triggers
+                Debug.Log($"🤖 Agent reached the goal at {currentTime:F2} seconds! Rewarding and restarting episode.");
+                agent.RewardReachGoal(); // This will reward the agent and restart the episode automatically
+                return; // Don't run the finish game sequence for ML-Agents training
+            }
+            
+            // Fallback for regular gameplay (no ML-Agents training)
             finished = true;
             Debug.Log($"🤖 Agent reached the goal first at {currentTime:F2} seconds!");
             StartCoroutine(FinishGame(false));
