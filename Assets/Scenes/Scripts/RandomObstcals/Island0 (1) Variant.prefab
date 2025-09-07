@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Island0 (1) Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 386033b9b0ae11a40bbd970400b6d7c6, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 386033b9b0ae11a40bbd970400b6d7c6, type: 3}
       propertyPath: m_RootOrder
       value: 0

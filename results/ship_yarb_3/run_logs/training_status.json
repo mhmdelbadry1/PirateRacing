@@ -1,0 +1,29 @@
+{
+    "ShipBrain": {
+        "checkpoints": [
+            {
+                "steps": 302720,
+                "file_path": "results\\ship_yarb_3\\ShipBrain\\ShipBrain-302720.onnx",
+                "reward": null,
+                "creation_time": 1757224784.6250622,
+                "auxillary_file_paths": [
+                    "results\\ship_yarb_3\\ShipBrain\\ShipBrain-302720.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 302720,
+            "file_path": "results\\ship_yarb_3\\ShipBrain.onnx",
+            "reward": null,
+            "creation_time": 1757224784.6250622,
+            "auxillary_file_paths": [
+                "results\\ship_yarb_3\\ShipBrain\\ShipBrain-302720.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.8.0+cpu"
+    }
+}

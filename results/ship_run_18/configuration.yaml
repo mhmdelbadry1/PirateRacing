@@ -1,6 +1,6 @@
 default_settings: null
 behaviors:
-  ShipAgent:
+  ShipBrain:
     trainer_type: ppo
     hyperparameters:
       batch_size: 1024
@@ -43,7 +43,13 @@ behaviors:
     summary_freq: 10000
     threaded: false
     self_play: null
-    behavioral_cloning: null
+    behavioral_cloning:
+      demo_path: D:/Unity/Projects/Pirates/Demonstrations
+      steps: 100000
+      strength: 0.3
+      samples_per_update: 0
+      num_epoch: 3
+      batch_size: 1024
 env_settings:
   env_path: null
   env_args: null

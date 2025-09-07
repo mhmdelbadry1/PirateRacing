@@ -2,37 +2,38 @@ behaviors:
   ShipBrain:
     trainer_type: ppo
     hyperparameters:
-      batch_size: 1024
-      buffer_size: 10240
-      learning_rate: 3.0e-4
-      beta: 5.0e-3
+      batch_size: 128
+      buffer_size: 4096
+      learning_rate: 0.0005
+      beta: 0.01
       epsilon: 0.2
       lambd: 0.95
       num_epoch: 3
       learning_rate_schedule: linear
     network_settings:
-      normalize: false
-      hidden_units: 128
-      num_layers: 2
+      normalize: true
+      hidden_units: 512
+      num_layers: 4
       vis_encode_type: simple
+      memory: null
+      goal_conditioning_type: hyper
+      deterministic: false
     reward_signals:
       extrinsic:
-        gamma: 0.99
+        gamma: 0.995
         strength: 1.0
-
-    # --- Behavioral Cloning (pretrain + blended) ---
     behavioral_cloning:
-      # This can be a single .demo file or a directory containing multiple .demo files.
-      # Using an absolute Windows path: ensure the Python process has access.
-      demo_path: "D:/Unity/Projects/Pirates/Assets/Demonstrations"
-      strength: 0.30 # how strongly BC loss influences updates (0.1 - 0.5 typical)
-      steps: 100000 # number of trainer steps BC is active (pretrain + blended phase)
-      batch_size: 1024
+      demo_path: D:/Unity/Projects/Pirates/Demonstrations
+      strength: 0.5
+      steps: 500000
+      samples_per_update: 0
       num_epoch: 3
-
-    # --- Checkpoints & training control ---
+      batch_size: 128
+    init_path: null
     keep_checkpoints: 5
-    max_steps: 500000
-    time_horizon: 64
-    summary_freq: 10000
-    threaded: false
+    even_checkpoints: false
+    max_steps: 10000000
+    time_horizon: 128
+    summary_freq: 20000
+    threaded: true
+    self_play: null

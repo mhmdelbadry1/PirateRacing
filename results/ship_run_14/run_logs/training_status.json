@@ -2,22 +2,22 @@
     "ShipBrain": {
         "checkpoints": [
             {
-                "steps": 6688,
-                "file_path": "results\\ship_run_14\\ShipBrain\\ShipBrain-6688.onnx",
+                "steps": 1216,
+                "file_path": "results\\ship_run_14\\ShipBrain\\ShipBrain-1216.onnx",
                 "reward": null,
-                "creation_time": 1757181413.6743484,
+                "creation_time": 1757195893.0013928,
                 "auxillary_file_paths": [
-                    "results\\ship_run_14\\ShipBrain\\ShipBrain-6688.pt"
+                    "results\\ship_run_14\\ShipBrain\\ShipBrain-1216.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 6688,
+            "steps": 1216,
             "file_path": "results\\ship_run_14\\ShipBrain.onnx",
             "reward": null,
-            "creation_time": 1757181413.6743484,
+            "creation_time": 1757195893.0013928,
             "auxillary_file_paths": [
-                "results\\ship_run_14\\ShipBrain\\ShipBrain-6688.pt"
+                "results\\ship_run_14\\ShipBrain\\ShipBrain-1216.pt"
             ]
         }
     },

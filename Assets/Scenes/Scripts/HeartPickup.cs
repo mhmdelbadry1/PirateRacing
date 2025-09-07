@@ -8,23 +8,34 @@ public class HeartPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // First check if the ML agent picked it up
+        var agent = other.GetComponent<ShipAgent>();
+        if (agent != null)
+        {
+            agent.RewardHeart(heartValue);
+            PlaySound();
+            Destroy(gameObject);
+            return;
+        }
+
+        // Fallback: human player
         if (other.CompareTag("Player"))
         {
             PlayerStats.hearts += heartValue;
-
-            if (pickupSound != null)
-            {
-                Debug.Log("[HeartPickup] Playing pickup sound");
-
-                AudioSource audioSource = Camera.main.GetComponent<AudioSource>();
-                if (audioSource == null)
-                    audioSource = Camera.main.gameObject.AddComponent<AudioSource>();
-
-                audioSource.spatialBlend = 0f; 
-                audioSource.PlayOneShot(pickupSound, pickupVolume);
-            }
-
+            PlaySound();
             Destroy(gameObject);
         }
+    }
+
+    void PlaySound()
+    {
+        if (pickupSound == null) return;
+        Debug.Log("[HeartPickup] Playing pickup sound");
+        var cam = Camera.main;
+        if (cam == null) return;
+        AudioSource audioSource = cam.GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = cam.gameObject.AddComponent<AudioSource>();
+        audioSource.spatialBlend = 0f;
+        audioSource.PlayOneShot(pickupSound, pickupVolume);
     }
 }
